@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Hash, Clock, Users, Layers, Award } from 'lucide-react';
 import { KaspaBlock } from '@/types/kaspa';
@@ -10,13 +11,31 @@ interface BlockInfoProps {
 }
 
 export default function BlockInfo({ block, onClose }: BlockInfoProps) {
+  // Force canvas redraw when modal unmounts
+  useEffect(() => {
+    return () => {
+      // Force page repaint when modal closes
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 50);
+    };
+  }, []);
+
+  const handleClose = () => {
+    onClose();
+    // Force canvas redraw after modal closes
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 100);
+  };
+
   return (
     <motion.div
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      onClick={onClose}
+      onClick={handleClose}
     >
       <motion.div
         className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 max-w-md w-full mx-4 block-info-panel"
@@ -32,7 +51,7 @@ export default function BlockInfo({ block, onClose }: BlockInfoProps) {
             Block #{block.id}
           </h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-400 hover:text-white transition-colors"
           >
             <X className="w-5 h-5" />

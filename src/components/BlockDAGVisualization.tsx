@@ -423,8 +423,13 @@ export default function BlockDAGVisualization() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // Clear canvas
+    // Force complete canvas clear and reset transform
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset any previous transforms
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0f172a'; // Dark background
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
     
     // Apply camera transform
     ctx.save();
@@ -687,6 +692,8 @@ export default function BlockDAGVisualization() {
           // Pause animation and select block
           isPausedRef.current = true;
           setSelectedBlock(block);
+          // Force canvas redraw after modal might interfere
+          setTimeout(() => render(), 100);
           return;
         }
       }
@@ -695,6 +702,8 @@ export default function BlockDAGVisualization() {
     // If no block was clicked, resume animation
     isPausedRef.current = false;
     setSelectedBlock(null);
+    // Force canvas redraw
+    setTimeout(() => render(), 100);
   };
 
   // Smooth animation loop - pure 60fps bliss!
@@ -753,13 +762,19 @@ export default function BlockDAGVisualization() {
         ctx.scale(dpr, dpr);
       }
       
-      render();
+      // Force a complete redraw after resize
+      setTimeout(() => render(), 10);
     };
     
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     
-    return () => window.removeEventListener('resize', resizeCanvas);
+    // Add listener for forced redraws (triggered by modal close)
+    window.addEventListener('resize', resizeCanvas);
+    
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+    };
   }, [render]);
 
   // Initialize with live data
@@ -864,10 +879,7 @@ export default function BlockDAGVisualization() {
     }));
   };
 
-  const handleCloseBlockInfo = () => {
-    setSelectedBlock(null);
-    isPausedRef.current = false;
-  };
+
 
   return (
     <div style={{ 
@@ -880,7 +892,11 @@ export default function BlockDAGVisualization() {
       {selectedBlock && (
         <BlockInfoPanel 
           block={selectedBlock} 
-          onClose={handleCloseBlockInfo}
+          onClose={() => {
+            setSelectedBlock(null);
+            // Force canvas redraw when modal closes
+            setTimeout(() => render(), 100);
+          }}
         />
       )}
       
