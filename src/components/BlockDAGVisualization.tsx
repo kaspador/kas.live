@@ -499,10 +499,23 @@ export default function BlockDAGVisualization() {
             if (!fromPos) return;
             
             // Check if this is a main chain connection
-            // A connection is main chain if both blocks are in the virtual selected parent chain
+            // In Kaspa's GHOSTDAG, the main chain is specifically the selectedParentId path
+            // AND both blocks must be in the virtual selected parent chain
             const parentBlock = allBlocksRef.current.find(b => b.id === parentId);
             const isMainChainConnection = block.isInVirtualSelectedParentChain && 
-                                        parentBlock?.isInVirtualSelectedParentChain;
+                                        parentBlock?.isInVirtualSelectedParentChain &&
+                                        parentId === block.selectedParentId;
+            
+            // Debug logging for specific blocks
+            if (block.id.toString().includes('7255') || parentId.toString().includes('7255')) {
+              console.log(`Block ${block.id} -> Parent ${parentId}:`, {
+                blockInChain: block.isInVirtualSelectedParentChain,
+                parentInChain: parentBlock?.isInVirtualSelectedParentChain,
+                isSelectedParent: parentId === block.selectedParentId,
+                selectedParentId: block.selectedParentId,
+                isMainChain: isMainChainConnection
+              });
+            }
             
             // Set connection style based on whether it's main chain or not
             if (isMainChainConnection) {
