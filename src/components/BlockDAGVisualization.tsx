@@ -498,10 +498,10 @@ export default function BlockDAGVisualization() {
       }
     });
     
-    // Debug: log main chain path
-    if (mainChainPath.size > 0) {
-      console.log('Main chain connections:', Array.from(mainChainPath).slice(0, 10));
-    }
+    // Debug: log main chain path (only once per data update)
+    // if (mainChainPath.size > 0) {
+    //   console.log('Main chain connections:', Array.from(mainChainPath).slice(0, 10));
+    // }
     
     // Draw arrows/connections FIRST (behind blocks)
     if (settings.showEdges) {
