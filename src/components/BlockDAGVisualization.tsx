@@ -782,6 +782,29 @@ export default function BlockDAGVisualization() {
     fetchLiveData();
   }, [fetchLiveData]);
 
+  // Add wheel event listener as non-passive for better preventDefault support
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleWheelNonPassive = (e: WheelEvent) => {
+      e.preventDefault();
+      const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1;
+      setCamera(prev => ({
+        ...prev,
+        scale: Math.max(0.1, Math.min(3, prev.scale * scaleFactor)),
+        targetScale: Math.max(0.1, Math.min(3, prev.scale * scaleFactor))
+      }));
+    };
+
+    // Add as non-passive listener
+    canvas.addEventListener('wheel', handleWheelNonPassive, { passive: false });
+
+    return () => {
+      canvas.removeEventListener('wheel', handleWheelNonPassive);
+    };
+  }, []);
+
   // Touch and mouse interaction handlers
   const getEventCoordinates = (e: React.MouseEvent | React.TouchEvent) => {
     if ('touches' in e && e.touches.length > 0) {
@@ -800,8 +823,10 @@ export default function BlockDAGVisualization() {
     mouseRef.current.startX = coords.clientX - camera.x;
     mouseRef.current.startY = coords.clientY - camera.y;
     
-    // Prevent default to avoid scrolling on mobile
-    e.preventDefault();
+    // Only prevent default for mouse events, not touch events (touchAction: 'none' handles touch)
+    if ('clientX' in e) {
+      e.preventDefault();
+    }
   };
 
   const handlePointerMove = (e: React.MouseEvent | React.TouchEvent) => {
@@ -818,7 +843,10 @@ export default function BlockDAGVisualization() {
       targetY: coords.clientY - mouseRef.current.startY
     }));
     
-    e.preventDefault();
+    // Only prevent default for mouse events, not touch events
+    if ('clientX' in e) {
+      e.preventDefault();
+    }
   };
 
   const handlePointerUp = () => {
@@ -861,7 +889,12 @@ export default function BlockDAGVisualization() {
         targetScale: clampedScale
       }));
       
-      e.preventDefault();
+      // touchAction: 'none' handles this, but we can try to prevent if needed
+      try {
+        e.preventDefault();
+      } catch (error) {
+        // Ignore passive listener errors
+      }
     } else {
       handlePointerMove(e);
     }
@@ -869,15 +902,6 @@ export default function BlockDAGVisualization() {
 
 
 
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1;
-    setCamera(prev => ({
-      ...prev,
-      scale: Math.max(0.1, Math.min(3, prev.scale * scaleFactor)),
-      targetScale: Math.max(0.1, Math.min(3, prev.scale * scaleFactor))
-    }));
-  };
 
 
 
@@ -927,7 +951,6 @@ export default function BlockDAGVisualization() {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handlePointerUp}
-            onWheel={handleWheel}
             onClick={handleCanvasInteraction}
             
             style={{
