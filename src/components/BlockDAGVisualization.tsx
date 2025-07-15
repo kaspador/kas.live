@@ -385,16 +385,13 @@ export default function BlockDAGVisualization() {
         
         if (blocksToAdd.length > 0) {
           allBlocksRef.current = [...allBlocksRef.current, ...blocksToAdd];
-          console.log(`Added ${blocksToAdd.length} new blocks. Total: ${allBlocksRef.current.length}`);
           
-          // Log block colors to see what we're getting from the API
+          // Track block colors for analysis
           const colorDistribution = blocksToAdd.reduce((acc: Record<string, number>, block: KaspaBlock) => {
             const color = block.color || 'undefined';
             acc[color] = (acc[color] || 0) + 1;
             return acc;
           }, {});
-          console.log('Block colors from API:', colorDistribution);
-          console.log('Sample block data:', blocksToAdd.slice(0, 2));
         }
         
         setIsConnected(true);
