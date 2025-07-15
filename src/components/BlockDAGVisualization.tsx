@@ -499,8 +499,10 @@ export default function BlockDAGVisualization() {
             if (!fromPos) return;
             
             // Check if this is a main chain connection
+            // A connection is main chain if both blocks are in the virtual selected parent chain
+            const parentBlock = allBlocksRef.current.find(b => b.id === parentId);
             const isMainChainConnection = block.isInVirtualSelectedParentChain && 
-                                        parentId === block.selectedParentId;
+                                        parentBlock?.isInVirtualSelectedParentChain;
             
             // Set connection style based on whether it's main chain or not
             if (isMainChainConnection) {
