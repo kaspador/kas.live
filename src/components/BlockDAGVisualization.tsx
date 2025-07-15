@@ -314,6 +314,7 @@ const BlockInfoPanel: React.FC<BlockInfoPanelProps> = ({ block, onClose }) => {
 };
 
 export default function BlockDAGVisualization() {
+  // Force Railway deployment trigger - can be removed later
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isConnected, setIsConnected] = useState(false);
