@@ -19,7 +19,7 @@ export default function BlockInfo({ block, onClose }: BlockInfoProps) {
       onClick={onClose}
     >
       <motion.div
-        className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 max-w-md w-full mx-4"
+        className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 max-w-md w-full mx-4 block-info-panel"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}

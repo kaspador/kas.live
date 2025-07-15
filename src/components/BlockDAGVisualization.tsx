@@ -386,12 +386,12 @@ export default function BlockDAGVisualization() {
         if (blocksToAdd.length > 0) {
           allBlocksRef.current = [...allBlocksRef.current, ...blocksToAdd];
           
-          // Track block colors for analysis
-          const colorDistribution = blocksToAdd.reduce((acc: Record<string, number>, block: KaspaBlock) => {
-            const color = block.color || 'undefined';
-            acc[color] = (acc[color] || 0) + 1;
-            return acc;
-          }, {});
+          // Track block colors for analysis (useful for debugging)
+          // const colorDistribution = blocksToAdd.reduce((acc: Record<string, number>, block: KaspaBlock) => {
+          //   const color = block.color || 'undefined';
+          //   acc[color] = (acc[color] || 0) + 1;
+          //   return acc;
+          // }, {});
         }
         
         setIsConnected(true);
@@ -619,16 +619,19 @@ export default function BlockDAGVisualization() {
     ctx.restore();
   }, [camera, settings, selectedBlock]);
 
-  // Handle block clicking
-  const handleCanvasClick = (e: React.MouseEvent) => {
+  // Handle block clicking and touching
+  const handleCanvasInteraction = (e: React.MouseEvent | React.TouchEvent) => {
     if (mouseRef.current.isDown) return; // Don't click if dragging
     
     const canvas = canvasRef.current;
     if (!canvas) return;
     
+    const coords = getEventCoordinates(e);
+    if (!coords) return;
+    
     const rect = canvas.getBoundingClientRect();
-    const clickX = (e.clientX - rect.left - camera.x) / camera.scale;
-    const clickY = (e.clientY - rect.top - camera.y) / camera.scale;
+    const clickX = (coords.clientX - rect.left - camera.x) / camera.scale;
+    const clickY = (coords.clientY - rect.top - camera.y) / camera.scale;
     
     // Check if click is on any block
     const heightGroups: { [key: number]: KaspaBlock[] } = {};
@@ -734,8 +737,22 @@ export default function BlockDAGVisualization() {
     
     const resizeCanvas = () => {
       const rect = container.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+      const dpr = window.devicePixelRatio || 1;
+      
+      // Set the actual size in memory (scaled for high DPI displays)
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      // Scale the canvas down using CSS
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      
+      // Scale the drawing context so everything draws at the correct size
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.scale(dpr, dpr);
+      }
+      
       render();
     };
     
@@ -750,28 +767,92 @@ export default function BlockDAGVisualization() {
     fetchLiveData();
   }, [fetchLiveData]);
 
-  // Canvas mouse interactions
-  const handleMouseDown = (e: React.MouseEvent) => {
-    mouseRef.current.isDown = true;
-    mouseRef.current.startX = e.clientX - camera.x;
-    mouseRef.current.startY = e.clientY - camera.y;
+  // Touch and mouse interaction handlers
+  const getEventCoordinates = (e: React.MouseEvent | React.TouchEvent) => {
+    if ('touches' in e && e.touches.length > 0) {
+      return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+    } else if ('clientX' in e) {
+      return { clientX: e.clientX, clientY: e.clientY };
+    }
+    return null;
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handlePointerDown = (e: React.MouseEvent | React.TouchEvent) => {
+    const coords = getEventCoordinates(e);
+    if (!coords) return;
+    
+    mouseRef.current.isDown = true;
+    mouseRef.current.startX = coords.clientX - camera.x;
+    mouseRef.current.startY = coords.clientY - camera.y;
+    
+    // Prevent default to avoid scrolling on mobile
+    e.preventDefault();
+  };
+
+  const handlePointerMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!mouseRef.current.isDown) return;
+    
+    const coords = getEventCoordinates(e);
+    if (!coords) return;
     
     setCamera(prev => ({
       ...prev,
-      x: e.clientX - mouseRef.current.startX,
-      y: e.clientY - mouseRef.current.startY,
-      targetX: e.clientX - mouseRef.current.startX,
-      targetY: e.clientY - mouseRef.current.startY
+      x: coords.clientX - mouseRef.current.startX,
+      y: coords.clientY - mouseRef.current.startY,
+      targetX: coords.clientX - mouseRef.current.startX,
+      targetY: coords.clientY - mouseRef.current.startY
     }));
+    
+    e.preventDefault();
   };
 
-  const handleMouseUp = () => {
+  const handlePointerUp = () => {
     mouseRef.current.isDown = false;
   };
+
+  // Touch-specific handlers for pinch-to-zoom
+  const touchStartRef = useRef<{ touches: React.TouchList | null; scale: number }>({ touches: null, scale: 1 });
+  
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartRef.current.touches = e.touches;
+    touchStartRef.current.scale = camera.scale;
+    handlePointerDown(e);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && touchStartRef.current.touches && touchStartRef.current.touches.length === 2) {
+      // Pinch to zoom
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const startTouch1 = touchStartRef.current.touches[0];
+      const startTouch2 = touchStartRef.current.touches[1];
+      
+      const currentDistance = Math.sqrt(
+        Math.pow(touch2.clientX - touch1.clientX, 2) +
+        Math.pow(touch2.clientY - touch1.clientY, 2)
+      );
+      
+      const startDistance = Math.sqrt(
+        Math.pow(startTouch2.clientX - startTouch1.clientX, 2) +
+        Math.pow(startTouch2.clientY - startTouch1.clientY, 2)
+      );
+      
+      const scale = (currentDistance / startDistance) * touchStartRef.current.scale;
+      const clampedScale = Math.max(0.5, Math.min(3, scale));
+      
+      setCamera(prev => ({
+        ...prev,
+        scale: clampedScale,
+        targetScale: clampedScale
+      }));
+      
+      e.preventDefault();
+    } else {
+      handlePointerMove(e);
+    }
+  };
+
+
 
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
@@ -816,27 +897,58 @@ export default function BlockDAGVisualization() {
         {/* Canvas Visualization */}
         <div 
           ref={containerRef}
+          className="canvas-container"
           style={{ 
-            width: '100%', 
-            height: '100%', 
-            position: 'relative', 
             cursor: mouseRef.current.isDown ? 'grabbing' : 'grab' 
           }}
         >
           <canvas
             ref={canvasRef}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
+            onMouseDown={handlePointerDown}
+            onMouseMove={handlePointerMove}
+            onMouseUp={handlePointerUp}
+            onMouseLeave={handlePointerUp}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handlePointerUp}
             onWheel={handleWheel}
-            onClick={handleCanvasClick}
+            onClick={handleCanvasInteraction}
+            
             style={{
               width: '100%',
               height: '100%',
-              display: 'block'
+              display: 'block',
+              touchAction: 'none'
             }}
           />
+        </div>
+        
+        {/* Mobile Controls */}
+        <div className="mobile-controls">
+          <button 
+            className="mobile-control-btn"
+            onClick={() => setCamera(prev => ({ ...prev, x: 0, y: 0, targetX: 0, targetY: 0 }))}
+          >
+            🏠 Center
+          </button>
+          <button 
+            className="mobile-control-btn"
+            onClick={() => setCamera(prev => ({ 
+              ...prev, 
+              scale: 1, 
+              targetScale: 1 
+            }))}
+          >
+            🔍 Reset Zoom
+          </button>
+          <button 
+            className="mobile-control-btn"
+            onClick={() => {
+              isPausedRef.current = !isPausedRef.current;
+            }}
+          >
+            {isPausedRef.current ? '▶️ Play' : '⏸️ Pause'}
+          </button>
         </div>
       </div>
     </div>
