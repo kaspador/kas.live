@@ -314,7 +314,6 @@ const BlockInfoPanel: React.FC<BlockInfoPanelProps> = ({ block, onClose }) => {
 };
 
 export default function BlockDAGVisualization() {
-  // Force Railway deployment trigger - can be removed later
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -488,6 +487,22 @@ export default function BlockDAGVisualization() {
       }
     });
     
+    // Build the main chain path by following selectedParentId connections
+    const mainChainPath = new Set<string>();
+    const mainChainBlocks = allBlocksRef.current.filter(b => b.isInVirtualSelectedParentChain);
+    
+    // Build main chain edges by following selectedParentId connections
+    mainChainBlocks.forEach(block => {
+      if (block.selectedParentId && mainChainBlocks.some(b => b.id === block.selectedParentId)) {
+        mainChainPath.add(`${block.selectedParentId}->${block.id}`);
+      }
+    });
+    
+    // Debug: log main chain path
+    if (mainChainPath.size > 0) {
+      console.log('Main chain connections:', Array.from(mainChainPath).slice(0, 10));
+    }
+    
     // Draw arrows/connections FIRST (behind blocks)
     if (settings.showEdges) {
       allBlocksRef.current.forEach(block => {
@@ -499,24 +514,9 @@ export default function BlockDAGVisualization() {
             const fromPos = blockPositions.get(parentId);
             if (!fromPos) return;
             
-            // Check if this is a main chain connection
-            // In Kaspa's GHOSTDAG, the main chain is specifically the selectedParentId path
-            // AND both blocks must be in the virtual selected parent chain
-            const parentBlock = allBlocksRef.current.find(b => b.id === parentId);
-            const isMainChainConnection = block.isInVirtualSelectedParentChain && 
-                                        parentBlock?.isInVirtualSelectedParentChain &&
-                                        parentId === block.selectedParentId;
-            
-            // Debug logging for specific blocks
-            if (block.id.toString().includes('7255') || parentId.toString().includes('7255')) {
-              console.log(`Block ${block.id} -> Parent ${parentId}:`, {
-                blockInChain: block.isInVirtualSelectedParentChain,
-                parentInChain: parentBlock?.isInVirtualSelectedParentChain,
-                isSelectedParent: parentId === block.selectedParentId,
-                selectedParentId: block.selectedParentId,
-                isMainChain: isMainChainConnection
-              });
-            }
+            // Check if this connection is part of the main chain path
+            const connectionKey = `${parentId}->${block.id}`;
+            const isMainChainConnection = mainChainPath.has(connectionKey);
             
             // Set connection style based on whether it's main chain or not
             if (isMainChainConnection) {
