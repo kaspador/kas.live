@@ -203,7 +203,7 @@ const BlockInfoPanel: React.FC<BlockInfoPanelProps> = ({ block, onClose }) => {
           borderRadius: '4px',
           color: '#6b7280'
         }}>
-          {(block as any).mergeSetSize || 'N/A'}
+          {(block.mergeSetRedIds?.length || 0) + (block.mergeSetBlueIds?.length || 0) || 'N/A'}
         </div>
       </div>
 
@@ -224,7 +224,7 @@ const BlockInfoPanel: React.FC<BlockInfoPanelProps> = ({ block, onClose }) => {
           borderRadius: '4px',
           color: '#6b7280'
         }}>
-          {(block as any).childrenIds?.length || 0}
+          N/A
         </div>
       </div>
 
@@ -244,7 +244,7 @@ const BlockInfoPanel: React.FC<BlockInfoPanelProps> = ({ block, onClose }) => {
           padding: '8px',
           borderRadius: '4px'
         }}>
-          {(block as any).isChainBlock ? 'Yes' : 'No'}
+          {block.isInVirtualSelectedParentChain ? 'Yes' : 'No'}
         </div>
       </div>
 
@@ -388,7 +388,7 @@ export default function BlockDAGVisualization() {
           console.log(`Added ${blocksToAdd.length} new blocks. Total: ${allBlocksRef.current.length}`);
           
           // Log block colors to see what we're getting from the API
-          const colorDistribution = blocksToAdd.reduce((acc: any, block: KaspaBlock) => {
+          const colorDistribution = blocksToAdd.reduce((acc: Record<string, number>, block: KaspaBlock) => {
             const color = block.color || 'undefined';
             acc[color] = (acc[color] || 0) + 1;
             return acc;
@@ -549,7 +549,7 @@ export default function BlockDAGVisualization() {
       
       // Only render if on screen (using original narrow range for actual rendering)
       if (xPosition > -camera.x - 200 && xPosition < -camera.x + canvas.width + 200) {
-        blocksAtHeight.forEach((block, blockIndex) => {
+        blocksAtHeight.forEach((block) => {
           // Use same positioning logic as arrow calculation
           const blockPos = blockPositions.get(block.id);
           if (!blockPos) return; // Skip if no position calculated
