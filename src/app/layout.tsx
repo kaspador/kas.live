@@ -1,25 +1,34 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Rubik, Oswald, Lato } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const rubik = Rubik({
+  variable: "--font-rubik",
   subsets: ["latin"],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const oswald = Oswald({
+  variable: "--font-oswald",
   subsets: ["latin"],
+  display: 'swap',
+});
+
+const lato = Lato({
+  variable: "--font-lato",
+  subsets: ["latin"],
+  weight: ["300", "400", "700"],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: "Kaspa BlockDAG - Live Visualization",
-  description: "Real-time animated visualization of the Kaspa blockchain's blockDAG structure with beautiful 3D blocks and smooth animations.",
-  keywords: ["Kaspa", "blockchain", "blockDAG", "visualization", "cryptocurrency", "DAG", "real-time"],
-  authors: [{ name: "Kaspa BlockDAG Visualizer" }],
+  title: "$KAS Smart Contracts Countdown - Deployed by Kasplex",
+  description: "Countdown timer until Kaspa smart contracts are deployed by Kasplex. Join the revolution in blockchain technology with the fastest, most scalable proof-of-work network.",
+  keywords: ["Kaspa", "smart contracts", "Kasplex", "cryptocurrency", "blockchain", "countdown", "$KAS", "deployment"],
+  authors: [{ name: "Kaspa Community" }],
   openGraph: {
-    title: "Kaspa BlockDAG - Live Visualization",
-    description: "Real-time animated visualization of the Kaspa blockchain's blockDAG structure",
+    title: "$KAS Smart Contracts Countdown - Deployed by Kasplex",
+    description: "Countdown timer until Kaspa smart contracts are deployed by Kasplex",
     type: "website",
   },
 };
@@ -39,14 +48,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${rubik.variable} ${oswald.variable} ${lato.variable} antialiased`}
         style={{
-          backgroundColor: '#0f172a',
+          backgroundColor: '#231F20',
           color: 'white',
           overflow: 'hidden',
           margin: 0,
           padding: 0,
-          fontFamily: 'var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+          fontFamily: 'var(--font-lato), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
         }}
       >
         {children}

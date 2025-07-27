@@ -9,9 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@types/canvas-confetti": "^1.9.0",
     "@types/d3": "^7.4.3",
-    "canvas-confetti": "^1.9.3",
     "clsx": "^2.1.1",
     "d3": "^7.9.0",
     "framer-motion": "^12.23.5",
