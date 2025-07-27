@@ -24,6 +24,7 @@ const KaspaCountdown = () => {
   
   const [currentFactIndex, setCurrentFactIndex] = useState(0);
   const [hasReachedZero, setHasReachedZero] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   const funFacts = [
     (time: TimeLeft) => `${time.days} nights of dreams until smart contracts arrive! 🌙`,
@@ -98,7 +99,7 @@ const KaspaCountdown = () => {
   };
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const calculateTime = () => {
       const now = new Date().getTime();
       const difference = targetDate - now;
 
@@ -117,10 +118,19 @@ const KaspaCountdown = () => {
           playSuccessSound();
         }
       }
-    }, 1000);
+      
+      if (isLoading) {
+        setIsLoading(false);
+      }
+    };
+
+    // Calculate immediately on mount
+    calculateTime();
+    
+    const timer = setInterval(calculateTime, 1000);
 
     return () => clearInterval(timer);
-  }, [targetDate, hasReachedZero]);
+  }, [targetDate, hasReachedZero, isLoading]);
 
   // Rotate fun facts every 3 seconds for more engagement
   useEffect(() => {
@@ -131,7 +141,7 @@ const KaspaCountdown = () => {
     return () => clearInterval(factTimer);
   }, []);
 
-  const isZero = timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0;
+  const isZero = !isLoading && timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0;
 
   return (
     <div className={styles.countdownContainer}>
@@ -155,7 +165,12 @@ const KaspaCountdown = () => {
 
         {/* Countdown Display */}
         <div className={styles.countdownDisplay}>
-          {isZero ? (
+          {isLoading ? (
+            <div className={styles.loadingMessage}>
+              <div className={styles.loadingSpinner}></div>
+              <p className={styles.loadingText}>Loading countdown...</p>
+            </div>
+          ) : isZero ? (
             <div className={styles.celebrationMessage}>
               <h2 className={styles.celebrationTitle}>🎉 Smart Contracts Are Live! 🎉</h2>
               <p className={styles.celebrationSubtitle}>The future of Kaspa has arrived!</p>
