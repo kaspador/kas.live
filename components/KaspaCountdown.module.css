@@ -1,0 +1,271 @@
+.countdownContainer {
+  min-height: 100vh;
+  background: 
+    linear-gradient(135deg, rgba(35, 31, 32, 0.85) 0%, rgba(26, 23, 24, 0.85) 50%, rgba(35, 31, 32, 0.85) 100%),
+    url('/images/kasplex-bg.jpg') center/cover no-repeat fixed,
+    linear-gradient(45deg, transparent 25%, rgba(112, 199, 186, 0.02) 25%, rgba(112, 199, 186, 0.02) 50%, transparent 50%, transparent 75%, rgba(112, 199, 186, 0.02) 75%),
+    radial-gradient(circle at 20% 20%, rgba(73, 234, 203, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(112, 199, 186, 0.05) 0%, transparent 50%),
+    #231F20;
+  background-size: 100% 100%, cover, 60px 60px, 100% 100%, 100% 100%, 100% 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: var(--font-lato), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.countdownContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 40%, rgba(112, 199, 186, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 70% 60%, rgba(73, 234, 203, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.contentWrapper {
+  text-align: center;
+  max-width: 800px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.headerSection {
+  margin-bottom: 3rem;
+}
+
+.mainTitle {
+  font-family: var(--font-rubik), sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  color: #70C7BA;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 0 30px rgba(112, 199, 186, 0.3);
+  line-height: 1.1;
+}
+
+.subtitle {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  color: #B6B6B6;
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
+.kasplexHighlight {
+  color: #49EACB;
+  font-weight: 600;
+  text-shadow: 0 0 20px rgba(73, 234, 203, 0.4);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.kasplexHighlight:hover {
+  color: #70C7BA;
+  text-shadow: 0 0 25px rgba(112, 199, 186, 0.6);
+  border-bottom: 1px solid #70C7BA;
+  transform: translateY(-1px);
+}
+
+.countdownDisplay {
+  margin: 3rem 0;
+}
+
+.timerGrid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(1rem, 4vw, 2rem);
+  flex-wrap: wrap;
+}
+
+.timeUnit {
+  background: rgba(112, 199, 186, 0.15);
+  border: 2px solid rgba(112, 199, 186, 0.4);
+  border-radius: 16px;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  min-width: clamp(80px, 15vw, 120px);
+  backdrop-filter: blur(15px);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(112, 199, 186, 0.2);
+  transition: all 0.3s ease;
+}
+
+.timeUnit:hover {
+  background: rgba(112, 199, 186, 0.2);
+  border-color: rgba(112, 199, 186, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(112, 199, 186, 0.3);
+}
+
+.timeNumber {
+  font-family: var(--font-oswald), monospace;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 700;
+  color: #70C7BA;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(112, 199, 186, 0.5);
+}
+
+.timeLabel {
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  color: #B6B6B6;
+  margin-top: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.timeSeparator {
+  font-size: clamp(2rem, 6vw, 3rem);
+  color: #49EACB;
+  font-weight: bold;
+  text-shadow: 0 0 20px rgba(73, 234, 203, 0.5);
+}
+
+.loadingMessage {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(112, 199, 186, 0.3);
+  border-top: 3px solid #70C7BA;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loadingText {
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  color: #B6B6B6;
+  margin: 0;
+  opacity: 0.8;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.celebrationMessage {
+  padding: 2rem;
+}
+
+.celebrationTitle {
+  font-family: var(--font-rubik), sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: #49EACB;
+  margin: 0 0 1rem 0;
+  font-weight: 700;
+  text-shadow: 0 0 30px rgba(73, 234, 203, 0.6);
+}
+
+.celebrationSubtitle {
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  color: #70C7BA;
+  margin: 0;
+  font-weight: 500;
+}
+
+.funFacts {
+  margin: 3rem 0;
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.funFact {
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  color: #70C7BA;
+  margin: 0;
+  font-style: italic;
+  font-weight: 500;
+  animation: fadeInOut 3s infinite;
+  text-align: center;
+  line-height: 1.5;
+  text-shadow: 0 0 10px rgba(112, 199, 186, 0.3);
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+.branding {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(112, 199, 186, 0.2);
+}
+
+.kaspaLogo {
+  font-family: var(--font-rubik), sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  color: #70C7BA;
+  margin-bottom: 0.5rem;
+  letter-spacing: 3px;
+}
+
+.tagline {
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  color: #B6B6B6;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .countdownContainer {
+    padding: 15px;
+  }
+  
+  .timerGrid {
+    gap: 0.8rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 1rem;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  
+  .timeSeparator {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .headerSection {
+    margin-bottom: 2rem;
+  }
+  
+  .countdownDisplay {
+    margin: 2rem 0;
+  }
+  
+  .funFacts {
+    margin: 2rem 0;
+  }
+  
+  .branding {
+    margin-top: 2rem;
+  }
+}
