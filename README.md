@@ -1,5 +1,11 @@
 # Smart Contracts Landing Page
 
+---
+
+**SEO Tags:** kasplex layer 2, kasplex l2 zkevm, kaspa l2 smart contracts, kasplex smart contracts, kasplex based rollup l2, layer 2 kaspa, layer 2 kasplex
+
+---
+
 A modern, interactive landing page built with Next.js, TypeScript, Tailwind CSS, and Framer Motion featuring animated curtains and smooth animations.
 
 ## Features
