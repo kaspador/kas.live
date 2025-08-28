@@ -184,6 +184,60 @@
   font-weight: 500;
 }
 
+.comingSoonMessage {
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.comingSoonTitle {
+  font-family: var(--font-rubik), sans-serif;
+  font-size: clamp(3rem, 8vw, 5rem);
+  color: #70C7BA;
+  margin: 0 0 2rem 0;
+  font-weight: 700;
+  text-shadow: 0 0 40px rgba(112, 199, 186, 0.6);
+  letter-spacing: 2px;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.comingSoonSubtitle {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  color: #B6B6B6;
+  margin: 0 0 2rem 0;
+  font-weight: 400;
+  line-height: 1.5;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.comingSoonIcon {
+  font-size: clamp(3rem, 6vw, 4rem);
+  animation: bounce 2s infinite;
+  display: inline-block;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 40px rgba(112, 199, 186, 0.4);
+  }
+  to {
+    text-shadow: 0 0 60px rgba(112, 199, 186, 0.8), 0 0 80px rgba(112, 199, 186, 0.4);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
 .funFacts {
   margin: 3rem 0;
   min-height: 3rem;
